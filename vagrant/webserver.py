@@ -52,20 +52,14 @@ class webserverHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 
 			ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-			print "--------------------------- \n"
 			print ctype
-			print "--------------------------- \n"
 			print pdict
 			if ctype == 'multipart/form-data':
-				print "--------------------------- \n"
 				print self.rfile
-				print "--------------------------- \n"
 				print pdict
 				fields=cgi.parse_multipart(self.rfile, pdict)
-				print "--------------------------- \n"
 				print fields
 				messagecontent = fields.get('message')
-				print "--------------------------- \n"
 				print messagecontent
 
 			output = ""
