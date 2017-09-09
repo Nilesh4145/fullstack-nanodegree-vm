@@ -88,6 +88,21 @@ class webserverHandler(BaseHTTPRequestHandler):
 				self.wfile.write(output)
 				return
 
+
+			if self.path.endswith("/delete"):
+				self.send_response(200)
+				self.send_header('Content-type', 'text/html')
+				self.end_headers()
+
+				restaurant_id = self.path.split('/')[2]
+				restaurant_name = session.query(Restaurant).filter_by(id = restaurant_id).one().name
+				print restaurant_name
+				output = ""
+				output += "<html><body><h1> Are you sure you want to delete the details of %s" %restaurant_name
+				output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/%s/delete'><input type='submit' value='Delete'></form></br>" %restaurant_id
+				self.wfile.write(output)
+				return
+
 		except IOError:
 			self.send_error(404, "File Not Found %s" %self.path)
 
@@ -128,6 +143,21 @@ class webserverHandler(BaseHTTPRequestHandler):
 				self.send_header('Content-Type',	'text/html')
 				self.send_header('Location', '/restaurants')
 				self.end_headers()
+
+
+			if self.path.endswith("/delete"):
+				ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+
+				restaurant_id = self.path.split('/')[2]
+				to_delete = session.query(Restaurant).filter_by(id = restaurant_id).one()
+				
+				if to_delete != []:
+					session.delete(to_delete)
+					session.commit()
+					self.send_response(301)
+					self.send_header('Content-Type',	'text/html')
+					self.send_header('Location', '/restaurants')
+					self.end_headers()
 
 			# if ctype == 'multipart/form-data':
 			# 	fields=cgi.parse_multipart(self.rfile, pdict)
